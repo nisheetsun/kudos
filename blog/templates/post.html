@@ -1,0 +1,12 @@
+{#styling remaining#}
+{% load rest_framework %}
+
+<html><body>
+
+<form action="{% url 'blog-list' %}" method="POST">
+    {% csrf_token %}
+    {% render_form serializer %}
+    <input type="submit" value="Save">
+</form>
+
+</body></html>

@@ -1,0 +1,20 @@
+{% load rest_framework %}
+
+<html>
+<!-- 
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+</head> -->
+
+<body>
+
+    <form action="{% url 'blog-edit-post' pk=id %}" method="POST">
+        {% csrf_token %}
+        {% render_form serializer template_pack='rest_framework/vertical' %}
+        <input class="btn btn-default" type="submit" value="Save">
+    </form>
+
+
+</body>
+
+</html>

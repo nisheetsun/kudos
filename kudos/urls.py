@@ -15,9 +15,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+# wip
+from django.conf.urls import include as iinclude
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    # path('blog/', include('blog.urls')),
-    # path('author/', include('author.urls')),
+    path('blog/', include('blog.urls')),
+    path('author/', include('author.urls')),
+    path('api-auth/', iinclude('rest_framework.urls')),
 ]

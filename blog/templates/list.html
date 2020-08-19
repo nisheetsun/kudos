@@ -1,0 +1,31 @@
+{#wip#}
+
+{% load bootstrap4 %}
+
+{% block title %}
+    List of posts
+{% endblock %}
+
+<script>
+</script>
+
+{% block content %}
+
+    <table class="table">
+        {% for blog in data.results %}
+            <tr>
+                <td>{{ blog.id }}</td>
+                <td> <a href="/blog/{{ blog.id }}"> {{ blog.title }} </a></td>
+                <td> <p>{{ blog.short_content|truncatewords:"5" }}</p></td>
+                <td>{{ blog.number_of_kudos }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    <hr>
+
+{#    {% bootstrap_pagination blog_list url="/blog?page=1&flop=flip" extra="q=foo" size="small" %}#}
+
+    {#{% bootstrap_pagination data.results url="/blog?page=1" size="small" %}#}
+
+{% endblock %}

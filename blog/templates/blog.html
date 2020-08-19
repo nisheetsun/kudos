@@ -1,0 +1,32 @@
+{% load rest_framework %}
+<html>
+
+    <script>
+        function myFunction() {
+        }
+        </script>
+
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+</head>
+
+
+<body>
+
+    <div class="container">
+        <img src={{image_url}} class="img-fluid" style="max-width: 100%" alt="Responsive image">
+        <h2 class="font-weight-bold text-center display-1">{{ title }}</h2>
+        <blockquote class="blockquote">
+            <p>{{date_creatd}}</p>
+        </blockquote>
+
+        <button onclick="myFunction()" type="button" class="btn btn-dark" href="edit_post" class="btn btn-default">Give Kudos</button>
+    </div>
+
+    {% block content %}
+
+    {% endblock %}
+
+</body>
+
+</html>

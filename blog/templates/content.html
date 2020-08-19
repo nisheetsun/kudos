@@ -1,0 +1,29 @@
+{% extends 'blog.html' %}
+{% load rest_framework %}
+<html>
+
+<body>
+    {% block content %}
+    <style>
+        p {
+            margin-top: 10px;
+        }
+    </style>
+    <div class="container">
+        <div>
+            <p class="text-left .mt-1" id="content">Loading...</p>
+        </div>
+        <script type="text/javascript">
+            let apiUrl = '/blog/content/' + "{{id}}" + '/'
+            fetch(apiUrl).then(response => {
+                return response.json();
+            }).then(data => {
+                document.getElementById("content").innerHTML = data['content']
+            }).catch(err => {
+            });
+        </script>
+    </div>
+    {% endblock %}
+</body>
+
+</html>
