@@ -29,8 +29,10 @@ class BlogViewSet(viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         response = super(BlogViewSet, self).list(request, *args, **kwargs)
+        response.template_name='list.html'
+        return response
         if request.accepted_renderer.format == 'html':
-            return Response({'data': response.data}, template_name='list.html')
+            return Response({'response': response}, template_name='list.html')
         return response
 
     def retrieve(self, request, *args, **kwargs):

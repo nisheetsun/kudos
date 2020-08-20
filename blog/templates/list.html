@@ -1,31 +1,63 @@
 {#wip#}
 
 {% load bootstrap4 %}
+{% load rest_framework %}
+<html>
 
-{% block title %}
-    List of posts
-{% endblock %}
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+</head>
 
-<script>
-</script>
+<body>
+    <style>
+        .media {
+            margin-left: 20px;
+        }
 
-{% block content %}
+        .heading {
+            margin-top: 20px;
+            margin-left: 20px;
+            margin-bottom: 20px;
+        }
 
-    <table class="table">
-        {% for blog in data.results %}
-            <tr>
-                <td>{{ blog.id }}</td>
-                <td> <a href="/blog/{{ blog.id }}"> {{ blog.title }} </a></td>
-                <td> <p>{{ blog.short_content|truncatewords:"5" }}</p></td>
-                <td>{{ blog.number_of_kudos }}</td>
-            </tr>
-        {% endfor %}
-    </table>
+        .nav {
+            margin-left: 30px;
+            margin-right: 30px;
+            margin-top: 30px;
+        }
+    </style>
+    <h2 class="heading">List of all the blogs</h2>
+    {% for blog in results %}
+    <div class="media">
+        <div class="media-left media-middle">
+            <a href="/blog/{{ blog.id }}">
+                <img class="media-object" src="{{blog.image_url}}" width="100" height="100">
+            </a>
+        </div>
+        <div class="media-body">
+            <h4 class="media-heading">{{blog.title}}</h4>
+            <p class="media-heading">{{blog.short_content|truncatewords:"10"}}</p>
+        </div>
+    </div>
+    {% endfor %}
 
-    <hr>
+    <nav class="nav">
+        <ul class="pager">
+            {% if previous == None %}
+            <li class="previous disabled"><a href="{{previous}}"><span aria-hidden="true">&larr;</span> Older</a></li>
+            {% else %}
+            <li class="previous"><a href="{{previous}}"><span aria-hidden="true">&larr;</span> Older</a></li>
+            {% endif %}
+            {% if next == None %}
+            <li class="next disabled"><a href="{{next}}">Newer <span aria-hidden="true">&rarr;</span></a></li>
+            {% else %}
+            <li class="next"><a href="{{next}}">Newer <span aria-hidden="true">&rarr;</span></a></li>
+            {% endif %}
+            
+        </ul>
+    </nav>
 
-{#    {% bootstrap_pagination blog_list url="/blog?page=1&flop=flip" extra="q=foo" size="small" %}#}
 
-    {#{% bootstrap_pagination data.results url="/blog?page=1" size="small" %}#}
+</body>
 
-{% endblock %}
+</html>
