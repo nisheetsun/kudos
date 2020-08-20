@@ -1,10 +1,39 @@
 {% load rest_framework %}
 <html>
 
-    <script>
-        function myFunction() {
+<script>
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
         }
-        </script>
+        return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+    function myFunction() {
+        let apiUrl = '/blog/{{id}}/give_kudos/'
+        fetch(apiUrl, {
+            method: 'POST', credentials: 'same-origin', headers: {
+                "X-CSRFToken": csrftoken,
+                "Accept": "application/json",
+                "Content-Type": "application/json"
+            }
+        }).then(response => {
+            return response.json();
+        }).then(data => {
+            document.getElementById("number_of_kudos").innerHTML = data['number_of_kudos']
+        }).catch(err => {
+        });
+    }
+</script>
 
 <head>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
@@ -12,6 +41,13 @@
 
 
 <body>
+    <style>
+        .panel{
+            width: 200;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+    </style>
 
     <div class="container">
         <img src={{image_url}} class="img-fluid" style="max-width: 100%" alt="Responsive image">
@@ -20,7 +56,16 @@
             <p>{{date_creatd}}</p>
         </blockquote>
 
-        <button onclick="myFunction()" type="button" class="btn btn-dark" href="edit_post" class="btn btn-default">Give Kudos</button>
+            <button onclick="myFunction()" type="button" class="btn btn-dark btn btn-default mr-auto p-2" href="edit_post">
+                Give Kudos
+            </button>
+
+            <div class="panel panel-default panel-success">
+                <div class="panel-body panel-success">
+                    Number of Kudos
+                </div>
+                <div id="number_of_kudos" class="panel-footer panel-success">{{number_of_kudos}}</div>
+              </div>
     </div>
 
     {% block content %}

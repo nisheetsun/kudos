@@ -3,15 +3,18 @@ from .models import Blog, Content
 
 
 class ContentSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(read_only=True)
     class Meta:
         model = Content
         fields = '__all__'
 
 
 class BlogSerializer(serializers.ModelSerializer):
-    title = serializers.CharField(style={'base_template': 'textarea.html'})
-    content = serializers.CharField(write_only=True)
+    id = serializers.IntegerField(read_only=True)
+    title = serializers.CharField()
+    content = serializers.CharField(write_only=True, style={'base_template': 'textarea.html', 'rows': 10}, allow_blank=True)
     number_of_kudos = serializers.IntegerField(default=0, read_only=True)
+    # author = serializers.IntegerField(AppUser, related_name="authors")
 
     class Meta:
         model = Blog
@@ -24,3 +27,21 @@ class BlogSerializer(serializers.ModelSerializer):
         content.is_valid(raise_exception=True)
         content.save()
         return blog
+    
+    def update(self, instance, validated_data):
+        _content = validated_data.pop('content', '')
+        blog = super(BlogSerializer, self).update(instance, validated_data)
+        content = Content.objects.get(blog=blog)
+        content_data = {'blog': blog.id, 'content': _content}
+        serializer = ContentSerializer(content, data=content_data)
+        serializer.is_valid()
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return blog
+
+class BlogSerializerKudos(serializers.ModelSerializer):
+    number_of_kudos = serializers.IntegerField(default=0, read_only=True)
+
+    class Meta:
+        model = Blog
+        fields = ['number_of_kudos']

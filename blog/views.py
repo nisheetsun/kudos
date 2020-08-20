@@ -2,14 +2,14 @@ from .models import Blog, Content
 from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
-from .serializers import BlogSerializer, ContentSerializer
+from .serializers import BlogSerializer, ContentSerializer, BlogSerializerKudos
 from django.shortcuts import redirect
 from rest_framework.decorators import action
 from rest_framework import viewsets, mixins
 from django.http import JsonResponse
 
 
-class ContentViewSet(mixins.UpdateModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
+class ContentViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     queryset = Content.objects.all()
     serializer_class = ContentSerializer
     renderer_classes = [JSONRenderer]
@@ -19,11 +19,6 @@ class ContentViewSet(mixins.UpdateModelMixin, mixins.RetrieveModelMixin, viewset
         serializer = self.serializer_class(content)
         return JsonResponse(serializer.data, safe=True)
 
-    def update(self, request, *args, **kwargs):
-        # wip
-        content = get_object_or_404(self.queryset, blog=kwargs['pk'])
-        # serializer = self.serializer_class(content)
-        # serializer.data['content'] = 
 
 
 class BlogViewSet(viewsets.ModelViewSet):
@@ -40,7 +35,7 @@ class BlogViewSet(viewsets.ModelViewSet):
 
     def retrieve(self, request, *args, **kwargs):
         if kwargs['pk'] == 'post_new_blog':
-            # move this to a action
+            # can a seperate view
             serializer = self.get_serializer()
             template = 'post.html'
             data = {'serializer': serializer}
@@ -62,9 +57,13 @@ class BlogViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['get', 'post'])
     def edit_post(self, request, *args, **kwargs):
         if request.method == "POST":
-            response = super(BlogViewSet, self).partial_update(request, *args, **kwargs)
-            redirect_url = '/blog/' + kwargs['pk']
-            return redirect(redirect_url)
+            blog = get_object_or_404(Blog, pk=kwargs['pk'])
+            serializer = self.serializer_class(blog, data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            if request.accepted_renderer.format == 'html':
+                redirect_url = '/blog/' + kwargs['pk']
+                return redirect(redirect_url)
         blog = get_object_or_404(Blog, pk=kwargs['pk'])
         serializer = self.serializer_class(blog)
         template = 'edit.html'
@@ -74,12 +73,14 @@ class BlogViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'])
     def give_kudos(self, request, *args, **kwargs):
-        # wip
-        blog = get_object_or_404(Blog, pk=1)
-        serializer = self.serializer_class(blog)
-        serializer.data['number_of_kudos'] = serializer.data['number_of_kudos'] + 1
-        serializer = self.serializer_class(data=serializer.data)
-        return {}
+        blog = get_object_or_404(Blog, pk=kwargs['pk'])
+        data = blog.__dict__
+        data['number_of_kudos'] = data['number_of_kudos'] + 1
+        serializer = BlogSerializerKudos(blog, data=data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return JsonResponse(serializer.data, status=200)
+
 
     def destroy(self, request, pk=None):
         # wip

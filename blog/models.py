@@ -5,6 +5,7 @@ from kudos.model import BaseModal
 
 
 class Blog(BaseModal):
+    id = models.IntegerField(primary_key=True)
     title = models.CharField(max_length=100)
     image_url = models.URLField(max_length=200, blank=True)
     short_content = models.CharField(max_length=50)
@@ -16,8 +17,9 @@ class Blog(BaseModal):
 
 
 class Content(BaseModal):
+    id = models.IntegerField(primary_key=True)
     blog = models.OneToOneField(Blog, on_delete=models.CASCADE)
-    content = models.CharField(max_length=1000)
+    content = models.CharField(max_length=1000, blank=True)
 
 # class Kudos(BaseModal):
 

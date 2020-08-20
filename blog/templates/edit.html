@@ -1,20 +1,46 @@
 {% load rest_framework %}
 
 <html>
-<!-- 
+
 <head>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-</head> -->
+    <style>
+        .form-parent {
+            margin-right: 20px;
+            margin-left: 20px;
+            margin-top: 30px;
+        }
+
+        .center {
+            text-align: center;
+        }
+    </style>
+</head>
 
 <body>
+    <h2 class="center"> EDIT BLOG </h2>
+    <div class="form-parent">
+        <form action="{% url 'blog-edit-post' pk=id %}" method="POST">
+            {% csrf_token %}
+            {% render_form serializer template_pack='rest_framework/vertical' %}
+            <input class="btn btn-default" type="submit" value="Save">
+        </form>
+    </div>
 
-    <form action="{% url 'blog-edit-post' pk=id %}" method="POST">
-        {% csrf_token %}
-        {% render_form serializer template_pack='rest_framework/vertical' %}
-        <input class="btn btn-default" type="submit" value="Save">
-    </form>
+    <div class="form-parent" ><a href="/blog/{{id}}">Discard changes and view blog</a></div>
+
 
 
 </body>
+
+<script type="text/javascript">
+    let apiUrl = '/blog/content/' + "{{id}}" + '/'
+    fetch(apiUrl).then(response => {
+        return response.json();
+    }).then(data => {
+        document.getElementsByName("content")[0].value = data['content']
+    }).catch(err => {
+    });
+</script>
 
 </html>
