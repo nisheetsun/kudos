@@ -8,5 +8,5 @@ router.register(r'', views.BlogViewSet, basename='blog')
 router.register(r'content', views.ContentViewSet, basename='content')
 
 urlpatterns = [
-    path('', include(router.urls))
+    path('', include(router.urls)),
 ]

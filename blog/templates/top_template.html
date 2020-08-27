@@ -1,0 +1,95 @@
+{% load rest_framework %}
+<html>
+
+<script>
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+
+<body>
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <!-- <div class="navbar-header">
+                <a class="navbar-brand" href="/blog/">HOME</a>
+            </div> -->
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li class="navbar-brand"><a href="/blog/">HOME <span class="sr-only">(current)</span></a></li>
+                </ul>
+                <ul class="nav navbar-nav">
+                    <li class="navbar-brand"><a href="/author/">AUTHORS <span class="sr-only">(current)</span></a></li>
+                </ul>
+                <ul class="nav navbar-nav">
+                    <li class="navbar-brand"><a href="/blog/?filter=draft">DRAFT <span
+                                class="sr-only">(current)</span></a></li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="/blog/create_blog/">Create new post</a></li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a id="login" onclick="loginlogout()">
+                            {% if user.is_authenticated %}
+                            Logout
+                            {% else %}
+                            Login
+                            {% endif %}
+                        </a></li>
+                </ul>
+
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a id="login" href="/author/{{user.id}}">
+                            {% if user.is_authenticated %}
+                            {{user}}
+                            {% else %}
+                            Anonymous user
+                            {% endif %}
+                        </a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    {% block page %}
+
+    {% endblock %}
+</body>
+
+<script>
+    // var csrftoken_parent = getCookie('csrftoken');
+    function loginlogout() {
+        if ("{{user.is_authenticated}}" == "False") {
+            window.location.replace("http://127.0.0.1:8000/api-auth/login/");
+        } else {
+            // document.cookie = "csrftoken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            let apiUrl = '/api-auth/logout/'
+            fetch(apiUrl).then(response => {
+                window.location.replace("http://127.0.0.1:8000/blog/");
+                return response.json();
+            }).then(data => {
+            }).catch(err => {
+            });
+        }
+    }
+    // if (csrftoken == null) {
+    //     document.getElementById("login").innerHTML = "Login"
+    // } else {
+    //     document.getElementById("login").innerHTML = "Logout"
+    // }
+</script>
+
+</html>

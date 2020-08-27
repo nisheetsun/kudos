@@ -1,5 +1,4 @@
 {% extends 'top_template.html' %}
-
 {% load bootstrap4 %}
 {% load rest_framework %}
 {% block page %}
@@ -10,6 +9,14 @@
 </head>
 
 <body>
+
+    <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+
+
+
+    <!-- Load our React component. -->
     <style>
         .media {
             margin-left: 20px;
@@ -27,8 +34,23 @@
             margin-top: 30px;
         } */
     </style>
-    <h2 class="heading">List of all the blogs</h2>
-    {% for blog in results %}
+    <h2 class="heading">Author Detail</h2>
+    <div class="media">
+        <div class="media-left media-middle">
+            <a href="/blog/{{ id }}">
+                <img class="media-object" src="{{image_url}}" style="width:200px;">
+            </a>
+        </div>
+        <div class="media-body">
+            <h4 class="media-heading">{{alias_name}}</h4>
+            <h4 class="media-heading">{{user_details.first_name}} {{user_details.last_name}}</h4>
+            <h4 class="media-heading">{{user_details.email}}</h4>
+            <p class="media-heading">{{bio}}</p>
+        </div>
+    </div>
+
+    <h3 class="heading">List of blogs by the author</h3>
+    {% for blog in blogs %}
     <div class="media">
         <div class="media-left media-middle">
             <a href="/blog/{{ blog.id }}">
@@ -42,23 +64,7 @@
     </div>
     {% endfor %}
 
-    <nav class="nav">
-        <ul class="pager">
-            {% if previous == None %}
-            <li class="previous disabled"><a><span aria-hidden="true">&larr;</span> Older</a></li>
-            {% else %}
-            <li class="previous"><a href="{{previous}}"><span aria-hidden="true">&larr;</span> Older</a></li>
-            {% endif %}
-
-            {% if next == None %}
-            <li class="next disabled"><a>Newer <span aria-hidden="true">&rarr;</span></a></li>
-            {% else %}
-            <li class="next"><a href="{{next}}">Newer <span aria-hidden="true">&rarr;</span></a></li>
-            {% endif %}
-
-        </ul>
-    </nav>
-
+    <!-- <div id="like_button_container"></div> -->
 
 </body>
 

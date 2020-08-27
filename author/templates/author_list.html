@@ -27,17 +27,17 @@
             margin-top: 30px;
         } */
     </style>
-    <h2 class="heading">List of all the blogs</h2>
-    {% for blog in results %}
+    <h2 class="heading">Authors</h2>
+    {% for author in results %}
     <div class="media">
         <div class="media-left media-middle">
-            <a href="/blog/{{ blog.id }}">
-                <img class="media-object" src="{{blog.image_url}}" width="100" height="100">
+            <a href="/author/{{ author.id }}">
+                <img class="media-object" src="{{author.image_url}}" style="width:200px;">
             </a>
         </div>
         <div class="media-body">
-            <h4 class="media-heading">{{blog.title}}</h4>
-            <p class="media-heading">{{blog.short_content|truncatewords:"10"}}</p>
+            <h4 class="media-heading">{{author.alias_name}}</h4>
+            <p class="media-heading">{{author.bio|truncatewords:"50"}}</p>
         </div>
     </div>
     {% endfor %}

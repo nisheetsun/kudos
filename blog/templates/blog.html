@@ -1,4 +1,6 @@
+{% extends 'top_template.html' %}
 {% load rest_framework %}
+{% block page %}
 <html>
 
 <script>
@@ -18,7 +20,7 @@
         return cookieValue;
     }
     const csrftoken = getCookie('csrftoken');
-    function myFunction() {
+    function giveKudos() {
         let apiUrl = '/blog/{{id}}/give_kudos/'
         fetch(apiUrl, {
             method: 'POST', credentials: 'same-origin', headers: {
@@ -33,6 +35,51 @@
         }).catch(err => {
         });
     }
+    function private() {
+        let apiUrl = '/blog/{{id}}/'
+        let is_private
+        if('{{is_private}}' == 'True'){
+            is_private = false
+        }else{
+            is_private = true
+        }
+        fetch(apiUrl, {
+            method: 'PATCH', credentials: 'same-origin', headers: {
+                "X-CSRFToken": csrftoken,
+                "Accept": "application/json",
+                "Content-Type": "application/json"
+            },
+            "body": JSON.stringify({ is_private })
+        }).then(response => {
+            if (response.status == 403){
+                alert('you are not authorised')
+            }else{
+                return response.json();
+            }
+        }).then(data => {
+            location.reload();
+        }).catch(err => {
+        });
+    }
+    function deleteFunc() {
+        let apiUrl = '/blog/{{id}}/'
+        fetch(apiUrl, {
+            method: 'DELETE', credentials: 'same-origin', headers: {
+                "X-CSRFToken": csrftoken,
+                "Accept": "application/json",
+                "Content-Type": "application/json"
+            }
+        }).then(response => {
+            if(response.status == 204){
+                window.location.replace("http://127.0.0.1:8000/blog/");
+            }else{
+                alert('NOT AUTHORISED.')
+            }
+            return response.json();
+        }).then(data => {
+        }).catch(err => {
+        });
+    }
 </script>
 
 <head>
@@ -42,7 +89,7 @@
 
 <body>
     <style>
-        .panel{
+        .panel {
             width: 200;
             margin-top: 10px;
             margin-bottom: 10px;
@@ -52,26 +99,68 @@
     <div class="container">
         <img src={{image_url}} class="img-fluid" style="max-width: 100%" alt="Responsive image">
         <h2 class="font-weight-bold text-center display-1">{{ title }}</h2>
-        <blockquote class="blockquote">
-            <p>{{date_creatd}}</p>
+
+        {% for a in author %}
+        <a href="/author/{{a.id}}/">
+            <div class="row" style="width: 500px">
+                <div class="col-sm-6 col-md-4">
+                    <div class="thumbnail">
+                        <img src="{{a.image_url}}" alt="...">
+                        <div class="caption">
+                            <h3>{{a.alias_name}}</h3>
+                            <p>{{a.bio|truncatewords:"30"}}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+
+        </br>
+
+        <p>{{date_creatd}}</p>
         </blockquote>
 
-            <button onclick="myFunction()" type="button" class="btn btn-dark btn btn-default mr-auto p-2" href="edit_post">
-                Give Kudos
-            </button>
+        <button onclick="giveKudos()" type="button" class="btn btn-dark btn btn-default mr-auto p-2">
+            Give Kudos
+        </button>
 
-            <div class="panel panel-default panel-success">
-                <div class="panel-body panel-success">
-                    Number of Kudos
-                </div>
-                <div id="number_of_kudos" class="panel-footer panel-success">{{number_of_kudos}}</div>
-              </div>
+        <div class="panel panel-default panel-success">
+            <div class="panel-body panel-success">
+                Number of Kudos
+            </div>
+            <div id="number_of_kudos" class="panel-footer panel-success">{{number_of_kudos}}</div>
+        </div>
+        <a href="edit_post"><button type="button" class="btn btn-dark btn btn-default mr-auto p-2" href="edit_post">
+                Edit blog
+            </button></a>
+        </br>
+
+        <button onclick="deleteFunc()" type="button" class="btn btn-dark btn btn-default mr-auto p-2">
+            Delete Post
+        </button>
+
+        <button id='privatebutton' onclick="private()" type="button" class="btn btn-dark btn btn-default mr-auto p-2">
+            
+        </button>
+
     </div>
 
+    </br>
     {% block content %}
 
     {% endblock %}
 
 </body>
 
+<script>
+if('{{is_private}}' == 'True'){
+    document.getElementById("privatebutton").innerHTML = "Make public"
+}else{
+    document.getElementById("privatebutton").innerHTML = "Make private"
+}
+
+</script>
+
 </html>
+{% endblock %}

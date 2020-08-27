@@ -17,6 +17,9 @@ from django.contrib import admin
 from django.urls import path, include
 # wip
 from django.conf.urls import include as iinclude
+from django.contrib.auth import views
+from django.conf.urls import url
+from django.views.generic.base import RedirectView
 
 
 urlpatterns = [
@@ -24,4 +27,6 @@ urlpatterns = [
     path('blog/', include('blog.urls')),
     path('author/', include('author.urls')),
     path('api-auth/', iinclude('rest_framework.urls')),
+    url(r'^accounts/profile/$', RedirectView.as_view(url='/blog/', permanent=False), name='blog'),
+    # path('login/', views.LoginView.as_view(template_name='rest_framework/login.html'), name='login'),
 ]

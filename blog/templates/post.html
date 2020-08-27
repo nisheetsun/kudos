@@ -1,12 +1,116 @@
-{#styling remaining#}
+{% extends 'top_template.html' %}
 {% load rest_framework %}
+{% block page %}
 
-<html><body>
+<html>
 
-<form action="{% url 'blog-list' %}" method="POST">
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+</head>
+
+
+<script>
+    var x
+    var results
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+    let apiUrl = '/author/authors_except_self/'
+    fetch(apiUrl, {
+        method: 'GET', credentials: 'same-origin', headers: {
+            "X-CSRFToken": csrftoken,
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+        }
+    }).then(response => {
+        return response.json();
+    }).then(data => {
+        results = data.results
+        x = document.getElementById("select_author");
+        data.results.forEach(function (item, index) {
+            var option = document.createElement("option");
+            option.text = item.alias_name;
+            option.value = item.user;
+            x.add(option);
+        });
+    }).catch(err => {
+    });
+    function getSelectValues(select) {
+        var result = [];
+        var options = select && select.options;
+        var opt;
+
+        for (var i = 0, iLen = options.length; i < iLen; i++) {
+            opt = options[i];
+
+            if (opt.selected) {
+                result.push(parseInt(opt.value));
+            }
+        }
+        return result;
+    }
+    function post() {
+        var author_list = getSelectValues(document.getElementById("select_author"))
+        let short_content = document.getElementsByName("short_content")[0].value
+        let image_url = document.getElementsByName("image_url")[0].value
+        let content = document.getElementsByName("content")[0].value
+        let title = document.getElementsByName("title")[0].value
+        let is_private = document.getElementsByName("is_private")[0].checked
+        let apiUrl = '/blog/'
+        fetch(apiUrl, {
+            method: 'POST', credentials: 'same-origin', headers: {
+                "X-CSRFToken": csrftoken,
+                "Accept": "application/json",
+                "Content-Type": "application/json"
+            },
+            "body": JSON.stringify({ author_list, short_content, image_url, content, title, is_private })
+        }).then(response => {
+            return response.json();
+        }).then(data => {
+            if('id' in data){
+                window.location.replace("http://127.0.0.1:8000/blog/" + data['id']);
+            }else{
+                alert(JSON.stringify(data))
+            }
+        }).catch(err => {
+        });
+
+
+    }
+</script>
+
+<body>
+
+    <!-- <form action="{% url 'blog-list' %}" method="POST"> -->
     {% csrf_token %}
     {% render_form serializer %}
-    <input type="submit" value="Save">
-</form>
+    <h5>Select co-authors</h5>
+    <select multiple id="select_author" class="form-control">
+    </select>
+    <button onclick="post()" type="button" class="btn btn-dark btn btn-default mr-auto p-2" href="edit_post">
+        Save
+    </button>
+    <!-- </form> -->
 
-</body></html>
+</body>
+
+<script>
+
+</script>
+
+</html>
+
+{% endblock %}
