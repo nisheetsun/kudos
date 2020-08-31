@@ -27,9 +27,16 @@ class BlogPermission(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         if request.user.is_superuser:
             return True
-        if view.action == "partial_update" or view.action == "edit_post" or view.action == "destroy" or view.action == "unpublish":
+        if view.action == "partial_update" or view.action == "edit_post" or view.action == "destroy":
             return can_access_blog(request, obj)
+        if view.action == "unpublish":
+            if request.user.is_staff:
+                return True
+            else:
+                return can_access_blog(request, obj)
         if view.action == "publish":
+            return not obj.is_private
+        if view.action == "retrieve":
             return not obj.is_private
 
         return True
