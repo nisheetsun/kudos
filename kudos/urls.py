@@ -27,6 +27,7 @@ urlpatterns = [
     path('blog/', include('blog.urls')),
     path('author/', include('author.urls')),
     path('api-auth/', iinclude('rest_framework.urls')),
+    # remove this work-around
     url(r'^accounts/profile/$', RedirectView.as_view(url='/blog/', permanent=False), name='blog'),
     # path('login/', views.LoginView.as_view(template_name='rest_framework/login.html'), name='login'),
 ]

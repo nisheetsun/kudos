@@ -3,7 +3,7 @@ from author.models import AppUser
 from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
-from .serializers import BlogSerializer, ContentSerializer, BlogSerializerKudos
+from .serializers import BlogSerializer, ContentSerializer, BlogSerializerUpdate
 from django.shortcuts import redirect
 from rest_framework.decorators import action
 from rest_framework import viewsets, mixins
@@ -35,9 +35,16 @@ class BlogViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         if self.action == 'list':
             if self.request.query_params.get('filter') == 'draft':
+                if self.request.user.is_superuser:
+                    # return draft blog by all users
+                    return Blog.objects.filter(is_private=True, is_published=False)
                 return Blog.objects.filter(is_private=True, author__parent_user__id__in=[self.request.user.id])
-            else:
-                return Blog.objects.filter(is_private=False)
+            if self.request.query_params.get('filter') == 'waiting':
+                if self.request.user.is_staff or self.request.user.is_superuser:
+                    # return waiting to be published blog by all users
+                    return Blog.objects.filter(is_private=False, is_published=False)
+                return Blog.objects.filter(is_private=False, author__parent_user__id__in=[self.request.user.id], is_published=False)
+            return Blog.objects.filter(is_private=False, is_published=True)
         return Blog.objects.all()
 
     def list(self, request, *args, **kwargs):
@@ -75,7 +82,27 @@ class BlogViewSet(viewsets.ModelViewSet):
         blog = get_object_or_404(Blog, pk=kwargs['pk'])
         data = blog.__dict__
         data['number_of_kudos'] = data['number_of_kudos'] + 1
-        serializer = BlogSerializerKudos(blog, data=data)
+        serializer = BlogSerializerUpdate(blog, data=data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return JsonResponse(serializer.data, status=200)
+    
+    @action(detail=True, methods=['post'])
+    def publish(self, request, *args, **kwargs):
+        blog = self.get_object()
+        data = blog.__dict__
+        data['is_published'] = True
+        serializer = BlogSerializerUpdate(blog, data=data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return JsonResponse(serializer.data, status=200)
+    
+    @action(detail=True, methods=['post'])
+    def unpublish(self, request, *args, **kwargs):
+        blog = self.get_object()
+        data = blog.__dict__
+        data['is_published'] = False
+        serializer = BlogSerializerUpdate(blog, data=data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return JsonResponse(serializer.data, status=200)

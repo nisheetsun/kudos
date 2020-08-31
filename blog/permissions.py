@@ -13,10 +13,13 @@ class BlogPermission(permissions.BasePermission):
         if request.user.is_superuser:
             return True
         if view.action == "list":
-            if request.query_params.get('filter') == 'draft':
+            if request.query_params.get('filter') == 'draft' or request.query_params.get('filter') == 'waiting':
                 return request.user.is_authenticated
-            else:
-                return True
+            return True
+        if view.action == "publish":
+            return request.user.is_staff
+        if view.action == "create_blog":
+            return request.user.is_authenticated
         if request.method in permissions.SAFE_METHODS or view.action == "give_kudos":
             return True
         return request.user.is_authenticated
@@ -24,6 +27,9 @@ class BlogPermission(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         if request.user.is_superuser:
             return True
-        if view.action == "partial_update" or view.action == "edit_post" or view.action == "destroy":
+        if view.action == "partial_update" or view.action == "edit_post" or view.action == "destroy" or view.action == "unpublish":
             return can_access_blog(request, obj)
+        if view.action == "publish":
+            return not obj.is_private
+
         return True

@@ -3,6 +3,7 @@ from .models import AppUser
 from blog.serializers import BlogSerializer
 from .serializers import UserSerializer
 
+# solve import error and  move to author/serializers.py
 class AuthorBlogSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True)
     blogs = BlogSerializer(read_only=True, many=True, source='blog_set')

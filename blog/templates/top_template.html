@@ -39,6 +39,10 @@
                     <li class="navbar-brand"><a href="/blog/?filter=draft">DRAFT <span
                                 class="sr-only">(current)</span></a></li>
                 </ul>
+                <ul class="nav navbar-nav">
+                    <li class="navbar-brand"><a href="/blog/?filter=waiting">WAITING FOR APPROVAL<span
+                                class="sr-only">(current)</span></a></li>
+                </ul>
                 <ul class="nav navbar-nav navbar-right">
                     <li><a href="/blog/create_blog/">Create new post</a></li>
                 </ul>
@@ -53,14 +57,13 @@
                 </ul>
 
                 <ul class="nav navbar-nav navbar-right">
-                    <li><a id="login" href="/author/{{user.id}}">
-                            {% if user.is_authenticated %}
-                            {{user}}
-                            {% else %}
-                            Anonymous user
-                            {% endif %}
-                        </a></li>
+                    {% if user.is_authenticated %}
+                    <li><a id="login" href="/author/{{user.id}}">{{user}}</a></li>
+                    {% else %}
+                    <li><a id="login">Anonymous user</a></li>
+                    {% endif %}
                 </ul>
+
             </div>
         </div>
     </nav>

@@ -21,10 +21,11 @@ class BlogSerializer(serializers.ModelSerializer):
         child=serializers.IntegerField(),
         write_only=True
     )
+    is_published = serializers.BooleanField(read_only=True)
 
     class Meta:
         model = Blog
-        exclude = ['is_published', 'published_by']
+        exclude = ['published_by']
 
     def create(self, validated_data):
         content_data = validated_data.pop('content', '')
@@ -46,6 +47,7 @@ class BlogSerializer(serializers.ModelSerializer):
         content_data = validated_data.pop('content', False)
         author_list = validated_data.pop('author_list', [])
         authors = AppUser.objects.filter(id__in=author_list)
+        validated_data['is_published'] = False
         blog = super(BlogSerializer, self).update(instance, validated_data)
         for author in authors:
             blog.author.add(author)
@@ -57,9 +59,10 @@ class BlogSerializer(serializers.ModelSerializer):
             serializer.save()
         return blog
 
-class BlogSerializerKudos(serializers.ModelSerializer):
-    number_of_kudos = serializers.IntegerField(default=0, read_only=True)
+# This serializer exists because content and author_list is not required here.
+class BlogSerializerUpdate(serializers.ModelSerializer):
+    author = AuthorSerializer(many=True, read_only=True)
 
     class Meta:
         model = Blog
-        fields = ['number_of_kudos']
+        fields = '__all__'

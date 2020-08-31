@@ -38,9 +38,9 @@
     function private() {
         let apiUrl = '/blog/{{id}}/'
         let is_private
-        if('{{is_private}}' == 'True'){
+        if ('{{is_private}}' == 'True') {
             is_private = false
-        }else{
+        } else {
             is_private = true
         }
         fetch(apiUrl, {
@@ -51,9 +51,9 @@
             },
             "body": JSON.stringify({ is_private })
         }).then(response => {
-            if (response.status == 403){
+            if (response.status == 403) {
                 alert('you are not authorised')
-            }else{
+            } else {
                 return response.json();
             }
         }).then(data => {
@@ -61,6 +61,28 @@
         }).catch(err => {
         });
     }
+    function publish() {
+        let apiUrl = '/blog/{{id}}/publish/'
+        if ('{{is_published}}' == 'True') {
+            apiUrl = '/blog/{{id}}/unpublish/'
+        }
+        fetch(apiUrl, {
+            method: 'POST', credentials: 'same-origin', headers: {
+                "X-CSRFToken": csrftoken,
+                "Accept": "application/json",
+                "Content-Type": "application/json"
+            },
+        }).then(response => {
+            if (response.status == 403) {
+                alert('No permission dude')
+            }
+            return response.json();
+        }).then(data => {
+            location.reload();
+        }).catch(err => {
+        });
+    }
+
     function deleteFunc() {
         let apiUrl = '/blog/{{id}}/'
         fetch(apiUrl, {
@@ -70,9 +92,9 @@
                 "Content-Type": "application/json"
             }
         }).then(response => {
-            if(response.status == 204){
+            if (response.status == 204) {
                 window.location.replace("http://127.0.0.1:8000/blog/");
-            }else{
+            } else {
                 alert('NOT AUTHORISED.')
             }
             return response.json();
@@ -141,7 +163,11 @@
         </button>
 
         <button id='privatebutton' onclick="private()" type="button" class="btn btn-dark btn btn-default mr-auto p-2">
-            
+
+        </button>
+
+        <button id='publishbutton' onclick="publish()" type="button" class="btn btn-dark btn btn-default mr-auto p-2">
+
         </button>
 
     </div>
@@ -154,11 +180,17 @@
 </body>
 
 <script>
-if('{{is_private}}' == 'True'){
-    document.getElementById("privatebutton").innerHTML = "Make public"
-}else{
-    document.getElementById("privatebutton").innerHTML = "Make private"
-}
+    if ('{{is_private}}' == 'True') {
+        document.getElementById("privatebutton").innerHTML = "Make public"
+    } else {
+        document.getElementById("privatebutton").innerHTML = "Make private"
+    }
+
+    if ('{{is_published}}' == 'True') {
+        document.getElementById("publishbutton").innerHTML = "Un-publish"
+    } else {
+        document.getElementById("publishbutton").innerHTML = "Publish"
+    }
 
 </script>
 
